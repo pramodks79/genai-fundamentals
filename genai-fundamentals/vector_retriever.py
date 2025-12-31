@@ -14,12 +14,27 @@ driver = GraphDatabase.driver(
 )
 
 # Create embedder
+from neo4j_graphrag.embeddings.openai import OpenAIEmbeddings
+embedder = OpenAIEmbeddings(model="text-embedding-ada-002")
+
 
 # Create retriever
+from neo4j_graphrag.retrievers import VectorRetriever
+retriever = VectorRetriever(
+    driver,
+    index_name="moviePlots",
+    embedder=embedder,
+    return_properties=["title", "plot"],
+)
 
 # Search for similar items
+# Search for similar items
+result = retriever.search(query_text="Toys coming alive", top_k=5)
 
 # Parse results
+# Parse results
+for item in result.items:
+    print(item.content, item.metadata["score"])
 
 # CLose the database connection
 driver.close()
